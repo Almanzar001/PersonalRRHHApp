@@ -18,7 +18,8 @@ import * as ImagePicker from 'expo-image-picker';
 import * as ImageManipulator from 'expo-image-manipulator';
 import { supabase } from '../../lib/supabase';
 import { Grupo } from '../../types/types';
-import { colors, spacing, typography, borders } from '../../styles/theme';
+import { colors, spacing, typography, borders, getResponsiveSpacing, getResponsiveFontSize } from '../../styles/theme';
+import { useResponsive } from '../../hooks/useResponsive';
 
 interface AddPersonalModalProps {
   visible: boolean;
@@ -31,6 +32,7 @@ const AddPersonalModal: React.FC<AddPersonalModalProps> = ({
   onClose,
   onSuccess,
 }) => {
+  const { isMobile, isTablet, width } = useResponsive();
   const [nombres, setNombres] = useState('');
   const [apellidos, setApellidos] = useState('');
   const [cedula, setCedula] = useState('');
@@ -305,6 +307,53 @@ const AddPersonalModal: React.FC<AddPersonalModalProps> = ({
     onClose();
   };
 
+  const getResponsiveStyles = () => {
+    return {
+      modal: {
+        backgroundColor: '#FFFFFF',
+        borderRadius: 12,
+        width: isMobile ? '95%' : isTablet ? '80%' : '90%',
+        maxWidth: isMobile ? 400 : isTablet ? 600 : 500,
+        maxHeight: isMobile ? '95%' : '90%',
+        shadowColor: '#000000',
+        shadowOffset: { width: 0, height: 4 },
+        shadowOpacity: 0.15,
+        shadowRadius: 12,
+        elevation: 8,
+      },
+      form: {
+        padding: getResponsiveSpacing(16, isMobile, isTablet),
+      },
+      inputGroup: {
+        marginBottom: getResponsiveSpacing(12, isMobile, isTablet),
+      },
+      input: {
+        borderWidth: 1,
+        borderColor: '#E5E7EB',
+        borderRadius: 8,
+        paddingHorizontal: getResponsiveSpacing(12, isMobile, isTablet),
+        paddingVertical: getResponsiveSpacing(8, isMobile, isTablet),
+        fontSize: getResponsiveFontSize(16, isMobile, isTablet),
+        color: '#1F2937',
+        backgroundColor: '#FFFFFF',
+        height: isMobile ? 40 : 44,
+      },
+      label: {
+        fontSize: getResponsiveFontSize(14, isMobile, isTablet),
+        fontWeight: '500',
+        color: '#1F2937',
+        marginBottom: 4,
+      },
+      title: {
+        fontSize: getResponsiveFontSize(20, isMobile, isTablet),
+        fontWeight: '600',
+        color: '#1F2937',
+      },
+    };
+  };
+
+  const responsiveStyles = getResponsiveStyles();
+
   if (loading) {
     return (
       <Modal visible={visible} transparent={true} animationType="fade">
@@ -334,13 +383,13 @@ const AddPersonalModal: React.FC<AddPersonalModalProps> = ({
           onPress={handleClose}
         >
           <TouchableOpacity
-            style={styles.modal}
+            style={responsiveStyles.modal}
             activeOpacity={1}
             onPress={() => {}}
           >
             {/* Header */}
             <View style={styles.header}>
-              <Text style={styles.title}>Agregar Personal</Text>
+              <Text style={responsiveStyles.title}>Agregar Personal</Text>
               <TouchableOpacity
                 style={styles.closeButton}
                 onPress={handleClose}
@@ -354,10 +403,10 @@ const AddPersonalModal: React.FC<AddPersonalModalProps> = ({
               style={styles.content}
               showsVerticalScrollIndicator={false}
             >
-              <View style={styles.form}>
+              <View style={responsiveStyles.form}>
                 {/* Foto */}
-                <View style={styles.inputGroup}>
-                  <Text style={styles.label}>Foto</Text>
+                <View style={responsiveStyles.inputGroup}>
+                  <Text style={responsiveStyles.label}>Foto</Text>
                   <TouchableOpacity
                     style={styles.photoContainer}
                     onPress={selectPhoto}
@@ -380,10 +429,10 @@ const AddPersonalModal: React.FC<AddPersonalModalProps> = ({
                 </View>
 
                 {/* Nombres */}
-                <View style={styles.inputGroup}>
-                  <Text style={styles.label}>Nombres *</Text>
+                <View style={responsiveStyles.inputGroup}>
+                  <Text style={responsiveStyles.label}>Nombres *</Text>
                   <TextInput
-                    style={[styles.input, errors.nombres && styles.inputError]}
+                    style={[responsiveStyles.input, errors.nombres && styles.inputError]}
                     value={nombres}
                     onChangeText={setNombres}
                     placeholder="Ingrese los nombres"
@@ -395,10 +444,10 @@ const AddPersonalModal: React.FC<AddPersonalModalProps> = ({
                 </View>
 
                 {/* Apellidos */}
-                <View style={styles.inputGroup}>
-                  <Text style={styles.label}>Apellidos</Text>
+                <View style={responsiveStyles.inputGroup}>
+                  <Text style={responsiveStyles.label}>Apellidos</Text>
                   <TextInput
-                    style={styles.input}
+                    style={responsiveStyles.input}
                     value={apellidos}
                     onChangeText={setApellidos}
                     placeholder="Ingrese los apellidos"
@@ -407,10 +456,10 @@ const AddPersonalModal: React.FC<AddPersonalModalProps> = ({
                 </View>
 
                 {/* Cédula */}
-                <View style={styles.inputGroup}>
-                  <Text style={styles.label}>Cédula *</Text>
+                <View style={responsiveStyles.inputGroup}>
+                  <Text style={responsiveStyles.label}>Cédula *</Text>
                   <TextInput
-                    style={[styles.input, errors.cedula && styles.inputError]}
+                    style={[responsiveStyles.input, errors.cedula && styles.inputError]}
                     value={cedula}
                     onChangeText={(text) => {
                       const formatted = formatCedula(text);

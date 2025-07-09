@@ -6,12 +6,15 @@ import MetricCard from "./MetricCard";
 import DocumentsWidget from "./DocumentsWidgetLocal";
 import RemindersWidget from "./RemindersWidget";
 import ProjectList from "./ProjectList";
-import { colors, spacing } from "../../styles/theme";
+import { colors, spacing, getResponsiveSpacing } from "../../styles/theme";
 import { useStatistics } from "../../hooks/useStatistics";
+import { useResponsive, useResponsiveColumns } from "../../hooks/useResponsive";
 
 const DashboardScreen = () => {
   const router = useRouter();
   const statistics = useStatistics();
+  const { isMobile, isTablet, width } = useResponsive();
+  const metricsColumns = useResponsiveColumns(3);
 
   const handleMetricPress = (metric: string) => {
     switch (metric) {
@@ -28,6 +31,29 @@ const DashboardScreen = () => {
         console.log(`Pressed ${metric}`);
     }
   };
+
+  const getResponsiveStyles = () => {
+    return {
+      scrollView: {
+        flex: 1,
+        padding: getResponsiveSpacing(spacing.xl, isMobile, isTablet),
+      },
+      metricsGrid: {
+        flexDirection: isMobile ? 'column' : 'row',
+        flexWrap: 'wrap',
+        gap: getResponsiveSpacing(spacing.lg, isMobile, isTablet),
+        marginBottom: getResponsiveSpacing(spacing.xxxl, isMobile, isTablet),
+      },
+      widgetsGrid: {
+        flexDirection: isMobile ? 'column' : 'row',
+        flexWrap: 'wrap',
+        gap: getResponsiveSpacing(spacing.lg, isMobile, isTablet),
+        marginBottom: getResponsiveSpacing(spacing.xxxl, isMobile, isTablet),
+      },
+    };
+  };
+
+  const responsiveStyles = getResponsiveStyles();
 
   if (statistics.loading) {
     return (
@@ -52,73 +78,74 @@ const DashboardScreen = () => {
 
   return (
     <AppLayout>
-      <ScrollView style={styles.scrollView} showsVerticalScrollIndicator={false}>
-        {/* Primera fila de métricas */}
-        <View style={styles.metricsRow}>
+      <ScrollView style={responsiveStyles.scrollView} showsVerticalScrollIndicator={false}>
+        {/* Grid de métricas responsive */}
+        <View style={responsiveStyles.metricsGrid}>
           <MetricCard
             title="Total Personal"
             value={statistics.totalPersonal}
             onPress={() => handleMetricPress('personal')}
+            style={isMobile ? styles.mobileCard : styles.desktopCard}
+            icon="people"
           />
           <MetricCard
             title="Miembros ERD"
             value={statistics.miembrosERD}
             onPress={() => handleMetricPress('personal')}
+            style={isMobile ? styles.mobileCard : styles.desktopCard}
+            icon="shield"
           />
           <MetricCard
             title="Miembros ARD"
             value={statistics.miembrosARD}
             onPress={() => handleMetricPress('personal')}
+            style={isMobile ? styles.mobileCard : styles.desktopCard}
+            icon="boat"
           />
           <MetricCard
             title="Miembros FARD"
             value={statistics.miembrosFARD}
             onPress={() => handleMetricPress('personal')}
+            style={isMobile ? styles.mobileCard : styles.desktopCard}
+            icon="airplane"
           />
-        </View>
-
-        {/* Segunda fila de métricas */}
-        <View style={styles.metricsRow}>
           <MetricCard
             title="Miembros PN"
             value={statistics.miembrosPN}
             onPress={() => handleMetricPress('personal')}
+            style={isMobile ? styles.mobileCard : styles.desktopCard}
+            icon="car"
           />
           <MetricCard
             title="Miembros MIDE"
             value={statistics.miembrosMIDE}
             onPress={() => handleMetricPress('personal')}
+            style={isMobile ? styles.mobileCard : styles.desktopCard}
+            icon="business"
           />
-          <View style={styles.emptyCard} />
-          <View style={styles.emptyCard} />
         </View>
-        
-        {/* Widgets */}
-        <View style={styles.contentRow}>
+        {/* Grid de widgets responsive */}
+        <View style={responsiveStyles.widgetsGrid}>
           <DocumentsWidget />
           <RemindersWidget />
           <ProjectList />
         </View>
-
       </ScrollView>
     </AppLayout>
   );
 };
 
 const styles = StyleSheet.create({
-  scrollView: {
+  mobileCard: {
+    width: '100%',
+    minHeight: 120,
+    marginBottom: spacing.sm,
+  },
+  desktopCard: {
     flex: 1,
-    padding: spacing.xl,
-  },
-  metricsRow: {
-    flexDirection: 'row',
-    gap: spacing.lg,
-    marginBottom: spacing.xxxl,
-  },
-  contentRow: {
-    flexDirection: 'row',
-    gap: spacing.lg,
-    marginBottom: spacing.xxxl,
+    minWidth: 250,
+    maxWidth: 350,
+    minHeight: 140,
   },
   loadingContainer: {
     flex: 1,
@@ -141,10 +168,6 @@ const styles = StyleSheet.create({
     fontSize: 16,
     color: colors.error,
     textAlign: 'center',
-  },
-  emptyCard: {
-    flex: 1,
-    minWidth: 0,
   },
 });
 

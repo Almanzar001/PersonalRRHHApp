@@ -53,7 +53,7 @@ export const typography = {
   },
 };
 
-// Espaciado fijo
+// Espaciado responsive
 export const spacing = {
   xs: 4,
   sm: 8,
@@ -62,6 +62,30 @@ export const spacing = {
   xl: 20,
   xxl: 24,
   xxxl: 32,
+  xxxxl: 48,
+};
+
+// Breakpoints para responsive
+export const breakpoints = {
+  mobile: 0,
+  tablet: 768,
+  desktop: 1024,
+  large: 1280,
+  xl: 1600,
+};
+
+// Función para obtener dimensiones responsive
+export const getResponsiveSpacing = (size: number, isMobile: boolean = false, isTablet: boolean = false) => {
+  if (isMobile) return size * 0.75;
+  if (isTablet) return size * 0.9;
+  return size;
+};
+
+// Función para obtener tamaño de fuente responsive
+export const getResponsiveFontSize = (size: number, isMobile: boolean = false, isTablet: boolean = false) => {
+  if (isMobile) return size * 0.9;
+  if (isTablet) return size * 0.95;
+  return size;
 };
 
 // Bordes

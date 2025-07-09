@@ -268,122 +268,105 @@ const UserManagementScreen: React.FC = () => {
         </View>
 
         {/* Users Table */}
-        <View style={[baseStyles.card, styles.tableContainer]}>
-          <View style={styles.tableHeader}>
-            <Text style={styles.tableTitle}>Lista de Usuarios</Text>
-          </View>
-
-          <View style={styles.table}>
-            {/* Table Headers */}
-            <View style={styles.tableHeaderRow}>
-              <Text style={[styles.tableHeaderText, styles.nameColumn]}>Usuario</Text>
-              <Text style={[styles.tableHeaderText, styles.roleColumn]}>Rol</Text>
-              <Text style={[styles.tableHeaderText, styles.statusColumn]}>Estado</Text>
-              <Text style={[styles.tableHeaderText, styles.lastLoginColumn]}>Último Acceso</Text>
-              <Text style={[styles.tableHeaderText, styles.actionsColumn]}>Acciones</Text>
-            </View>
-
-            {/* Table Body */}
-            <ScrollView style={styles.tableBody} nestedScrollEnabled={true}>
-              {users.map((user, index) => (
-                <View
-                  key={user.id}
-                  style={[
-                    styles.tableRow,
-                    index % 2 === 0 ? styles.evenRow : styles.oddRow,
-                    user.id === currentUser?.id && styles.currentUserRow
-                  ]}
-                >
-                  {/* Name Column */}
-                  <View style={styles.nameColumn}>
-                    <View style={styles.userInfo}>
-                      <View style={[styles.userAvatar, { borderColor: getRoleColor(user.role_name) }]}>
-                        <Ionicons 
-                          name={getRoleIcon(user.role_name)} 
-                          size={16} 
-                          color={getRoleColor(user.role_name)} 
-                        />
-                      </View>
-                      <View style={styles.userDetails}>
-                        <Text style={styles.userName}>
-                          {user.first_name} {user.last_name}
-                          {user.id === currentUser?.id && (
-                            <Text style={styles.currentUserTag}> (Tú)</Text>
-                          )}
-                        </Text>
-                        <Text style={styles.userEmail}>{user.email}</Text>
-                      </View>
-                    </View>
+        <View style={styles.usersGrid}>
+          {users.map((user, index) => (
+            <View
+              key={user.id}
+              style={[
+                baseStyles.card,
+                styles.userCard,
+                index % 2 === 0 ? styles.evenRow : styles.oddRow,
+                user.id === currentUser?.id && styles.currentUserRow
+              ]}
+            >
+              {/* Name Column */}
+              <View style={styles.nameColumn}>
+                <View style={styles.userInfo}>
+                  <View style={[styles.userAvatar, { borderColor: getRoleColor(user.role_name) }]}>
+                    <Ionicons 
+                      name={getRoleIcon(user.role_name)} 
+                      size={16} 
+                      color={getRoleColor(user.role_name)} 
+                    />
                   </View>
-
-                  {/* Role Column */}
-                  <View style={styles.roleColumn}>
-                    <View style={[styles.roleBadge, { backgroundColor: getRoleColor(user.role_name) + '20' }]}>
-                      <Text style={[styles.roleText, { color: getRoleColor(user.role_name) }]}>
-                        {user.role_name === 'admin' ? 'Administrador' : 
-                         user.role_name === 'user' ? 'Usuario' : 
-                         user.role_name === 'viewer' ? 'Observador' : user.role_name}
-                      </Text>
-                    </View>
-                  </View>
-
-                  {/* Status Column */}
-                  <View style={styles.statusColumn}>
-                    <View style={[
-                      styles.statusBadge,
-                      { backgroundColor: user.is_active ? colors.success + '20' : colors.error + '20' }
-                    ]}>
-                      <View style={[
-                        styles.statusDot,
-                        { backgroundColor: user.is_active ? colors.success : colors.error }
-                      ]} />
-                      <Text style={[
-                        styles.statusText,
-                        { color: user.is_active ? colors.success : colors.error }
-                      ]}>
-                        {user.is_active ? 'Activo' : 'Inactivo'}
-                      </Text>
-                    </View>
-                  </View>
-
-                  {/* Last Login Column */}
-                  <View style={styles.lastLoginColumn}>
-                    <Text style={styles.lastLoginText}>
-                      {formatDate(user.last_login)}
-                    </Text>
-                  </View>
-
-                  {/* Actions Column */}
-                  <View style={styles.actionsColumn}>
-                    <View style={styles.actionButtons}>
-                      <TouchableOpacity
-                        style={[
-                          styles.actionButton,
-                          { backgroundColor: user.is_active ? colors.warning + '20' : colors.success + '20' }
-                        ]}
-                        onPress={() => handleToggleUserStatus(user.id, user.is_active)}
-                      >
-                        <Ionicons 
-                          name={user.is_active ? "pause" : "play"} 
-                          size={16} 
-                          color={user.is_active ? colors.warning : colors.success} 
-                        />
-                      </TouchableOpacity>
-
-                      {user.id !== currentUser?.id && (
-                        <TouchableOpacity
-                          style={[styles.actionButton, styles.deleteButton]}
-                          onPress={() => handleDeleteUser(user.id, `${user.first_name} ${user.last_name}`)}
-                        >
-                          <Ionicons name="trash" size={16} color={colors.error} />
-                        </TouchableOpacity>
+                  <View style={styles.userDetails}>
+                    <Text style={styles.userName}>
+                      {user.first_name} {user.last_name}
+                      {user.id === currentUser?.id && (
+                        <Text style={styles.currentUserTag}> (Tú)</Text>
                       )}
-                    </View>
+                    </Text>
+                    <Text style={styles.userEmail}>{user.email}</Text>
                   </View>
                 </View>
-              ))}
-            </ScrollView>
-          </View>
+              </View>
+
+              {/* Role Column */}
+              <View style={styles.roleColumn}>
+                <View style={[styles.roleBadge, { backgroundColor: getRoleColor(user.role_name) + '20' }]}>
+                  <Text style={[styles.roleText, { color: getRoleColor(user.role_name) }]}>
+                    {user.role_name === 'admin' ? 'Administrador' : 
+                     user.role_name === 'user' ? 'Usuario' : 
+                     user.role_name === 'viewer' ? 'Observador' : user.role_name}
+                  </Text>
+                </View>
+              </View>
+
+              {/* Status Column */}
+              <View style={styles.statusColumn}>
+                <View style={[
+                  styles.statusBadge,
+                  { backgroundColor: user.is_active ? colors.success + '20' : colors.error + '20' }
+                ]}>
+                  <View style={[
+                    styles.statusDot,
+                    { backgroundColor: user.is_active ? colors.success : colors.error }
+                  ]} />
+                  <Text style={[
+                    styles.statusText,
+                    { color: user.is_active ? colors.success : colors.error }
+                  ]}>
+                    {user.is_active ? 'Activo' : 'Inactivo'}
+                  </Text>
+                </View>
+              </View>
+
+              {/* Last Login Column */}
+              <View style={styles.lastLoginColumn}>
+                <Text style={styles.lastLoginText}>
+                  {formatDate(user.last_login)}
+                </Text>
+              </View>
+
+              {/* Actions Column */}
+              <View style={styles.actionsColumn}>
+                <View style={styles.actionButtons}>
+                  <TouchableOpacity
+                    style={[
+                      styles.actionButton,
+                      { backgroundColor: user.is_active ? colors.warning + '20' : colors.success + '20' }
+                    ]}
+                    onPress={() => handleToggleUserStatus(user.id, user.is_active)}
+                  >
+                    <Ionicons 
+                      name={user.is_active ? "pause" : "play"} 
+                      size={16} 
+                      color={user.is_active ? colors.warning : colors.success} 
+                    />
+                  </TouchableOpacity>
+
+                  {user.id !== currentUser?.id && (
+                    <TouchableOpacity
+                      style={[styles.actionButton, styles.deleteButton]}
+                      onPress={() => handleDeleteUser(user.id, `${user.first_name} ${user.last_name}`)}
+                    >
+                      <Ionicons name="trash" size={16} color={colors.error} />
+                    </TouchableOpacity>
+                  )}
+                </View>
+              </View>
+            </View>
+          ))}
         </View>
       </ScrollView>
 
@@ -417,10 +400,7 @@ const styles = StyleSheet.create({
     color: colors.textSecondary,
   },
   headerSection: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    alignItems: 'flex-start',
-    marginBottom: spacing.xl,
+    marginBottom: spacing.xxxl,
   },
   titleContainer: {
     flex: 1,
@@ -625,6 +605,25 @@ const styles = StyleSheet.create({
   },
   deleteButton: {
     backgroundColor: colors.error + '20',
+  },
+  usersGrid: {
+    flexDirection: 'row',
+    flexWrap: 'wrap',
+    gap: spacing.lg,
+    marginBottom: spacing.xxxl,
+  },
+  userCard: {
+    width: '48%',
+    marginBottom: spacing.lg,
+  },
+  '@media (max-width: 700px)': {
+    usersGrid: {
+      flexDirection: 'column',
+      gap: spacing.lg,
+    },
+    userCard: {
+      width: '100%',
+    },
   },
 });
 

@@ -12,8 +12,9 @@ import {
 } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import { useAuth } from '../../contexts/AuthContext';
-import { colors, spacing, typography, borders } from '../../styles/theme';
+import { colors, spacing, typography, borders, getResponsiveSpacing } from '../../styles/theme';
 import { supabase } from '../../lib/supabase';
+import { useResponsive } from '../../hooks/useResponsive';
 
 interface Reminder {
   id: string;
@@ -28,6 +29,7 @@ interface Reminder {
 
 const RemindersWidget: React.FC = () => {
   const { user, isAdmin } = useAuth();
+  const { isMobile, isTablet } = useResponsive();
   const [reminders, setReminders] = useState<Reminder[]>([]);
   const [loading, setLoading] = useState(false);
   const [isModalOpen, setIsModalOpen] = useState(false);
@@ -613,12 +615,13 @@ const styles = StyleSheet.create({
     flex: 1,
     backgroundColor: 'white',
     borderRadius: 16,
-    padding: 20,
+    padding: getResponsiveSpacing(20, false, false),
     shadowColor: '#000',
     shadowOffset: { width: 0, height: 2 },
     shadowOpacity: 0.1,
     shadowRadius: 8,
     elevation: 4,
+    minWidth: 250,
   },
   titleContainer: {
     flexDirection: 'row',
@@ -666,15 +669,17 @@ const styles = StyleSheet.create({
   },
   remindersList: {
     maxHeight: 200,
+    minHeight: 120,
   },
   reminderItem: {
     backgroundColor: '#F9FAFB',
-    padding: 12,
+    padding: getResponsiveSpacing(12, false, false),
     borderRadius: 8,
-    marginBottom: 8,
+    marginBottom: getResponsiveSpacing(8, false, false),
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'space-between',
+    minHeight: 60,
   },
   reminderContent: {
     flex: 1,
@@ -730,12 +735,17 @@ const styles = StyleSheet.create({
   },
   reminderActions: {
     flexDirection: 'row',
-    gap: 8,
+    gap: getResponsiveSpacing(8, false, false),
+    minWidth: 100,
   },
   actionButton: {
-    padding: 8,
+    padding: getResponsiveSpacing(8, false, false),
     borderRadius: 20,
     backgroundColor: '#F3F4F6',
+    minWidth: 32,
+    minHeight: 32,
+    alignItems: 'center',
+    justifyContent: 'center',
   },
   emptyText: {
     textAlign: 'center',

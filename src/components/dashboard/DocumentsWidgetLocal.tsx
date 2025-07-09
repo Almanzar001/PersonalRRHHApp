@@ -14,7 +14,8 @@ import {
 import { Ionicons } from '@expo/vector-icons';
 import { supabase } from '../../lib/supabase';
 import { useAuth } from '../../contexts/AuthContext';
-import { colors, spacing, typography, borders } from '../../styles/theme';
+import { colors, spacing, typography, borders, getResponsiveSpacing } from '../../styles/theme';
+import { useResponsive } from '../../hooks/useResponsive';
 
 interface Document {
   id: string;
@@ -28,6 +29,7 @@ interface Document {
 
 const DocumentsWidgetLocal: React.FC = () => {
   const { user, isAdmin } = useAuth();
+  const { isMobile, isTablet } = useResponsive();
   
   // TEMPORAL: Override para testing (cambiar a false para probar como usuario normal)
   const isAdminOverride = true; // Cambiar a false para probar permisos
@@ -463,11 +465,12 @@ const styles = StyleSheet.create({
   container: {
     backgroundColor: colors.white,
     borderRadius: borders.radius.md,
-    padding: spacing.lg,
-    margin: spacing.sm,
+    padding: getResponsiveSpacing(spacing.lg, false, false),
+    margin: getResponsiveSpacing(spacing.sm, false, false),
     ...borders.shadow,
     height: 400,
     flex: 1,
+    minWidth: 250,
   },
   header: {
     flexDirection: 'row',
@@ -519,10 +522,11 @@ const styles = StyleSheet.create({
   documentItem: {
     flexDirection: 'row',
     alignItems: 'center',
-    padding: spacing.md,
+    padding: getResponsiveSpacing(spacing.md, false, false),
     backgroundColor: colors.backgroundSecondary + '40',
     borderRadius: borders.radius.sm,
-    marginBottom: spacing.sm,
+    marginBottom: getResponsiveSpacing(spacing.sm, false, false),
+    minHeight: 60,
   },
   documentIcon: {
     marginRight: spacing.md,
@@ -552,13 +556,15 @@ const styles = StyleSheet.create({
   },
   documentActions: {
     flexDirection: 'row',
-    gap: spacing.xs,
+    gap: getResponsiveSpacing(spacing.xs, false, false),
+    minWidth: 120,
   },
   actionButton: {
-    padding: spacing.sm,
+    padding: getResponsiveSpacing(spacing.sm, false, false),
     borderRadius: borders.radius.sm,
     backgroundColor: colors.white,
     minWidth: 36,
+    minHeight: 36,
     alignItems: 'center',
     justifyContent: 'center',
   },

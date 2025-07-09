@@ -3,11 +3,12 @@ import { View, Text, StyleSheet, ScrollView, TouchableOpacity, ActivityIndicator
 import { Ionicons } from '@expo/vector-icons';
 import { LinearGradient } from 'expo-linear-gradient';
 import AppLayout from '../../src/components/layout/AppLayout';
-import { baseStyles, colors, spacing, typography, borders, shadows } from '../../src/styles/theme';
+import { baseStyles, colors, spacing, typography, borders, shadows, getResponsiveSpacing } from '../../src/styles/theme';
 import { supabase } from '../../src/lib/supabase';
 import { Picker } from '@react-native-picker/picker';
 import * as XLSX from 'xlsx';
 import * as FileSaver from 'file-saver';
+import { useResponsive } from '../../src/hooks/useResponsive';
 
 interface PersonalData {
   id: string;
@@ -56,6 +57,7 @@ const genderCategories = [
 ];
 
 export default function AnalyticsScreen() {
+  const { isMobile, isTablet, isDesktop, isLarge } = useResponsive();
   const [personalData, setPersonalData] = useState<PersonalData[]>([]);
   const [filteredData, setFilteredData] = useState<PersonalData[]>([]);
   const [metrics, setMetrics] = useState<MetricCardData[]>([]);
@@ -201,6 +203,14 @@ export default function AnalyticsScreen() {
     setSelectedInstitution('all');
     setSelectedRankCategory('all');
     setSelectedGender('all');
+  };
+
+  const getCardWidth = () => {
+    if (isMobile) return '100%';
+    if (isTablet) return '48%';
+    if (isDesktop) return '31%';
+    if (isLarge) return '23%';
+    return '18%'; // Para pantallas muy grandes
   };
 
   const exportFilteredData = async () => {
@@ -512,10 +522,27 @@ export default function AnalyticsScreen() {
           </View>
 
           {/* Metrics Cards */}
-          <View style={styles.metricsGrid}>
-            {metrics.map((metric, index) => (
-              <MetricCard key={index} {...metric} />
-            ))}
+          <View style={styles.metricsContainer}>
+            <View style={styles.metricsGrid}>
+              {metrics.map((metric, idx) => (
+                <View key={idx} style={[baseStyles.card, styles.metricCard, { width: getCardWidth() }]}>
+                  <LinearGradient
+                    colors={metric.gradientColors}
+                    locations={[0, 0.5, 1]}
+                    style={styles.gradientHeader}
+                  />
+                  <View style={styles.cardContent}>
+                    <View style={[styles.cardIcon, { backgroundColor: metric.color + '20' }]}>
+                      <Ionicons name={metric.icon} size={14} color={metric.color} />
+                    </View>
+                    <View style={styles.cardTextContent}>
+                      <Text style={styles.cardValue}>{metric.value}</Text>
+                      <Text style={styles.cardTitle} numberOfLines={2}>{metric.title}</Text>
+                    </View>
+                  </View>
+                </View>
+              ))}
+            </View>
           </View>
 
           {/* Personal Table */}
@@ -563,10 +590,10 @@ export default function AnalyticsScreen() {
 const styles = StyleSheet.create({
   scrollView: {
     flex: 1,
-    padding: spacing.xl,
+    padding: getResponsiveSpacing(spacing.xl, false, false),
   },
   headerSection: {
-    marginBottom: spacing.xl,
+    marginBottom: getResponsiveSpacing(spacing.xl, false, false),
   },
   subtitle: {
     fontSize: typography.body,
@@ -585,12 +612,14 @@ const styles = StyleSheet.create({
   },
   filtersContainer: {
     flexDirection: 'row',
-    gap: spacing.md,
-    marginBottom: spacing.xl,
+    gap: getResponsiveSpacing(spacing.md, false, false),
+    marginBottom: getResponsiveSpacing(spacing.xl, false, false),
     alignItems: 'flex-end',
+    flexWrap: 'wrap',
   },
   filterGroup: {
     flex: 1,
+    minWidth: 150,
   },
   filterLabel: {
     fontSize: typography.body,
@@ -607,18 +636,22 @@ const styles = StyleSheet.create({
   picker: {
     height: 50,
   },
+  metricsContainer: {
+    marginBottom: getResponsiveSpacing(spacing.xxxl, false, false),
+  },
   metricsGrid: {
     flexDirection: 'row',
     flexWrap: 'wrap',
-    gap: spacing.sm,
-    marginBottom: spacing.xl,
+    gap: getResponsiveSpacing(spacing.lg, false, false),
+    alignItems: 'stretch',
+    justifyContent: 'flex-start',
   },
   metricCard: {
-    width: '13.5%',
-    minWidth: 90,
-    padding: spacing.xs,
+    marginBottom: getResponsiveSpacing(spacing.lg, false, false),
     position: 'relative',
     overflow: 'hidden',
+    minWidth: 180,
+    height: 120,
   },
   gradientHeader: {
     position: 'absolute',

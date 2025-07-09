@@ -7,12 +7,14 @@ import { Personal } from '../../src/types/types';
 import { Link, useRouter } from 'expo-router';
 import { useFocusEffect } from '@react-navigation/native';
 import AppLayout from '../../src/components/layout/AppLayout';
-import { baseStyles, colors, spacing, typography, borders } from '../../src/styles/theme';
+import { baseStyles, colors, spacing, typography, borders, getResponsiveSpacing, getResponsiveFontSize } from '../../src/styles/theme';
 import AddPersonalModal from '../../src/components/personal/AddPersonalModal';
 import EditPersonalModal from '../../src/components/personal/EditPersonalModal';
+import { useResponsive } from '../../src/hooks/useResponsive';
 
 const PersonalScreen = () => {
   const router = useRouter();
+  const { isMobile, isTablet, width } = useResponsive();
   const [personal, setPersonal] = useState<Personal[]>([]);
   const [filteredPersonal, setFilteredPersonal] = useState<Personal[]>([]);
   const [loading, setLoading] = useState(true);
@@ -198,6 +200,159 @@ const PersonalScreen = () => {
     }
   };
 
+  const getResponsiveStyles = () => {
+    return {
+      scrollView: {
+        flex: 1,
+        padding: getResponsiveSpacing(spacing.xl, isMobile, isTablet),
+      },
+      headerSection: {
+        marginBottom: getResponsiveSpacing(spacing.xxxl, isMobile, isTablet),
+      },
+      titleRow: {
+        flexDirection: isMobile ? 'column' : 'row',
+        justifyContent: 'space-between',
+        alignItems: isMobile ? 'stretch' : 'flex-start',
+        marginBottom: getResponsiveSpacing(spacing.lg, isMobile, isTablet),
+      },
+      searchContainer: {
+        width: isMobile ? '100%' : isTablet ? 300 : 350,
+        marginLeft: isMobile ? 0 : spacing.lg,
+        marginTop: isMobile ? spacing.md : 0,
+      },
+      personalGrid: {
+        flexDirection: isMobile ? 'column' : 'row',
+        flexWrap: 'wrap',
+        gap: getResponsiveSpacing(spacing.lg, isMobile, isTablet),
+        marginBottom: getResponsiveSpacing(spacing.xxxl, isMobile, isTablet),
+      },
+    };
+  };
+
+  const responsiveStyles = getResponsiveStyles();
+
+  const renderPersonalCard = (item: Personal) => {
+    if (isMobile) {
+      return (
+        <TouchableOpacity
+          key={item.id}
+          style={[baseStyles.card, styles.mobilePersonalCard]}
+          onPress={() => router.push(`/personal/${item.id}`)}
+          activeOpacity={0.8}
+        >
+          <View style={styles.mobileCardHeader}>
+            <Image
+              source={{
+                uri: item.foto_url || 'https://www.mona.uwi.edu/modlang/sites/default/files/modlang/male-avatar-placeholder.png'
+              }}
+              style={styles.mobileAvatar}
+            />
+            <View style={styles.mobileHeaderInfo}>
+              <Text style={styles.mobileNameText}>{item.nombres}</Text>
+              <Text style={styles.mobileSecondaryText}>{item.Apellidos || 'N/A'}</Text>
+              <Text style={styles.mobileSecondaryText}>{item.rango || 'N/A'}</Text>
+            </View>
+            <View style={styles.mobileActionButtons}>
+              <TouchableOpacity
+                style={styles.editButton}
+                onPress={(e) => {
+                  e.stopPropagation();
+                  setEditingPersonalId(item.id.toString());
+                  setShowEditModal(true);
+                }}
+              >
+                <Ionicons name="pencil" size={16} color={colors.primary} />
+              </TouchableOpacity>
+              <TouchableOpacity
+                style={styles.deleteButton}
+                onPress={(e) => {
+                  e.stopPropagation();
+                  handleDeletePersonal(item.id, `${item.nombres} ${item.Apellidos || ''}`.trim());
+                }}
+              >
+                <Ionicons name="trash" size={16} color={colors.error} />
+              </TouchableOpacity>
+            </View>
+          </View>
+          <View style={styles.mobileCardBody}>
+            <View style={styles.mobileInfoRow}>
+              <Text style={styles.mobileLabel}>Institución:</Text>
+              <Text style={styles.mobileValue}>{item.institucion || 'N/A'}</Text>
+            </View>
+            <View style={styles.mobileInfoRow}>
+              <Text style={styles.mobileLabel}>Cédula:</Text>
+              <Text style={styles.mobileValue}>{item.cedula || 'N/A'}</Text>
+            </View>
+            {item.telefono && (
+              <View style={styles.mobileInfoRow}>
+                <Text style={styles.mobileLabel}>Teléfono:</Text>
+                <Text style={styles.mobileValue}>{item.telefono}</Text>
+              </View>
+            )}
+          </View>
+        </TouchableOpacity>
+      );
+    } else {
+      return (
+        <TouchableOpacity
+          key={item.id}
+          style={[baseStyles.card, styles.desktopPersonalCard]}
+          onPress={() => router.push(`/personal/${item.id}`)}
+          activeOpacity={0.8}
+        >
+          <View style={styles.desktopCardRow}>
+            <View style={styles.photoColumn}>
+              <Image
+                source={{
+                  uri: item.foto_url || 'https://www.mona.uwi.edu/modlang/sites/default/files/modlang/male-avatar-placeholder.png'
+                }}
+                style={styles.avatar}
+              />
+            </View>
+            <View style={styles.rangoColumn}>
+              <Text style={styles.tableText}>{item.rango || 'N/A'}</Text>
+            </View>
+            <View style={styles.apellidosColumn}>
+              <Text style={styles.tableText}>{item.Apellidos || 'N/A'}</Text>
+            </View>
+            <View style={styles.nombresColumn}>
+              <Text style={styles.tableText}>{item.nombres}</Text>
+            </View>
+            <View style={styles.institucionColumn}>
+              <Text style={styles.tableText}>{item.institucion || 'N/A'}</Text>
+            </View>
+            <View style={styles.cedulaColumn}>
+              <Text style={styles.tableText}>{item.cedula || 'N/A'}</Text>
+            </View>
+            <View style={styles.actionsColumn}>
+              <View style={styles.actionButtons}>
+                <TouchableOpacity
+                  style={styles.editButton}
+                  onPress={(e) => {
+                    e.stopPropagation();
+                    setEditingPersonalId(item.id.toString());
+                    setShowEditModal(true);
+                  }}
+                >
+                  <Ionicons name="pencil" size={14} color={colors.primary} />
+                </TouchableOpacity>
+                <TouchableOpacity
+                  style={styles.deleteButton}
+                  onPress={(e) => {
+                    e.stopPropagation();
+                    handleDeletePersonal(item.id, `${item.nombres} ${item.Apellidos || ''}`.trim());
+                  }}
+                >
+                  <Ionicons name="trash" size={14} color={colors.error} />
+                </TouchableOpacity>
+              </View>
+            </View>
+          </View>
+        </TouchableOpacity>
+      );
+    }
+  };
+
   if (loading) {
     return (
       <AppLayout>
@@ -211,9 +366,9 @@ const PersonalScreen = () => {
 
   return (
     <AppLayout>
-      <ScrollView style={styles.scrollView} showsVerticalScrollIndicator={false}>
-          <View style={styles.headerSection}>
-            <View style={styles.titleRow}>
+      <ScrollView style={responsiveStyles.scrollView} showsVerticalScrollIndicator={false}>
+          <View style={responsiveStyles.headerSection}>
+            <View style={responsiveStyles.titleRow}>
               <View style={styles.titleContainer}>
                 <Text style={baseStyles.h2}>Gestión de Personal</Text>
                 <Text style={styles.subtitle}>
@@ -221,8 +376,7 @@ const PersonalScreen = () => {
                 </Text>
               </View>
 
-              {/* Campo de búsqueda al lado derecho */}
-              <View style={styles.searchContainer}>
+              <View style={responsiveStyles.searchContainer}>
                 <TextInput
                   style={styles.searchInput}
                   placeholder="Buscar por nombre, apellido, rango..."
@@ -259,123 +413,39 @@ const PersonalScreen = () => {
 
 
 
-          {/* Tabla de Personal */}
-          <View style={[baseStyles.card, styles.tableContainer]}>
-            {/* Header de la tabla */}
-            <View style={styles.tableHeader}>
-              <Text style={[styles.tableHeaderText, styles.photoColumn]}>Foto</Text>
-              <Text style={[styles.tableHeaderText, styles.rangoColumn]}>Rango</Text>
-              <Text style={[styles.tableHeaderText, styles.apellidosColumn]}>Apellidos</Text>
-              <Text style={[styles.tableHeaderText, styles.nombresColumn]}>Nombres</Text>
-              <Text style={[styles.tableHeaderText, styles.institucionColumn]}>Institución</Text>
-              <Text style={[styles.tableHeaderText, styles.cedulaColumn]}>Cédula</Text>
-              <Text style={[styles.tableHeaderText, styles.actionsColumn]}>Acciones</Text>
-            </View>
-
-            {/* Filas de la tabla */}
-            {filteredPersonal.map((item, index) => (
-              <TouchableOpacity
-                key={item.id}
-                style={[
-                  styles.tableRow,
-                  index % 2 === 0 ? styles.evenRow : styles.oddRow
-                ]}
-                onPress={() => router.push(`/personal/${item.id}`)}
-                activeOpacity={0.8}
-              >
-                {/* Foto */}
-                <View style={styles.photoColumn}>
-                  <Image
-                    source={{
-                      uri: item.foto_url || 'https://www.mona.uwi.edu/modlang/sites/default/files/modlang/male-avatar-placeholder.png'
-                    }}
-                    style={styles.avatar}
-                  />
-                </View>
-
-                {/* Rango */}
-                <View style={styles.rangoColumn}>
-                  <Text style={styles.tableText}>{item.rango || 'N/A'}</Text>
-                </View>
-
-                {/* Apellidos */}
-                <View style={styles.apellidosColumn}>
-                  <Text style={styles.tableText}>{item.Apellidos || 'N/A'}</Text>
-                </View>
-
-                {/* Nombres */}
-                <View style={styles.nombresColumn}>
-                  <Text style={styles.tableText}>{item.nombres}</Text>
-                </View>
-
-                {/* Institución */}
-                <View style={styles.institucionColumn}>
-                  <Text style={styles.tableText}>{item.institucion || 'N/A'}</Text>
-                </View>
-
-                {/* Cédula */}
-                <View style={styles.cedulaColumn}>
-                  <Text style={styles.tableText}>{item.cedula || 'N/A'}</Text>
-                </View>
-
-                {/* Acciones */}
-                <View style={styles.actionsColumn}>
-                  <View style={styles.actionButtons}>
-                    <TouchableOpacity
-                      style={styles.editButton}
-                      onPress={(e) => {
-                        e.stopPropagation();
-                        setEditingPersonalId(item.id.toString());
-                        setShowEditModal(true);
-                      }}
-                    >
-                      <Ionicons name="pencil" size={14} color={colors.primary} />
-                    </TouchableOpacity>
-
-                    <TouchableOpacity
-                      style={styles.deleteButton}
-                      onPress={(e) => {
-                        e.stopPropagation();
-                        handleDeletePersonal(item.id, `${item.nombres} ${item.Apellidos || ''}`.trim());
-                      }}
-                    >
-                      <Ionicons name="trash" size={14} color={colors.error} />
-                    </TouchableOpacity>
-                  </View>
-                </View>
-              </TouchableOpacity>
-            ))}
+          <View style={responsiveStyles.personalGrid}>
+            {filteredPersonal.map(renderPersonalCard)}
           </View>
-      </ScrollView>
+        </ScrollView>
 
-      {/* Modal para agregar personal */}
-      <AddPersonalModal
-        visible={showAddModal}
-        onClose={() => setShowAddModal(false)}
-        onSuccess={() => {
-          setShowAddModal(false);
-          fetchPersonal(); // Recargar la lista
-        }}
-      />
-
-      {editingPersonalId && (
-        <EditPersonalModal
-          visible={showEditModal}
-          personalId={editingPersonalId}
-          onClose={() => {
-            setShowEditModal(false);
-            setEditingPersonalId(null);
-          }}
+        <AddPersonalModal
+          visible={showAddModal}
+          onClose={() => setShowAddModal(false)}
           onSuccess={() => {
-            setShowEditModal(false);
-            setEditingPersonalId(null);
-            fetchPersonal(); // Recargar la lista
+            setShowAddModal(false);
+            fetchPersonal();
           }}
         />
-      )}
-    </AppLayout>
-  );
-};
+
+        {editingPersonalId && (
+          <EditPersonalModal
+            visible={showEditModal}
+            personalId={editingPersonalId}
+            onClose={() => {
+              setShowEditModal(false);
+              setEditingPersonalId(null);
+            }}
+            onSuccess={() => {
+              setShowEditModal(false);
+              setEditingPersonalId(null);
+              fetchPersonal();
+            }}
+          />
+        )}
+      </AppLayout>
+    );
+  };
+
 
 const styles = StyleSheet.create({
   scrollView: {
@@ -555,6 +625,71 @@ const styles = StyleSheet.create({
     backgroundColor: colors.error + '1A',
     alignItems: 'center',
     justifyContent: 'center',
+  },
+  // Estilos para mobile
+  mobilePersonalCard: {
+    width: '100%',
+    marginBottom: spacing.lg,
+  },
+  mobileCardHeader: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    marginBottom: spacing.md,
+  },
+  mobileAvatar: {
+    width: 50,
+    height: 50,
+    borderRadius: 25,
+    backgroundColor: colors.primary + '1A',
+    marginRight: spacing.md,
+  },
+  mobileHeaderInfo: {
+    flex: 1,
+  },
+  mobileNameText: {
+    fontSize: getResponsiveFontSize(typography.subtitle, true),
+    fontWeight: typography.fontWeights.semibold,
+    color: colors.textPrimary,
+  },
+  mobileSecondaryText: {
+    fontSize: getResponsiveFontSize(typography.bodySm, true),
+    color: colors.textSecondary,
+    marginTop: spacing.xs,
+  },
+  mobileActionButtons: {
+    flexDirection: 'row',
+    gap: spacing.xs,
+  },
+  mobileCardBody: {
+    paddingTop: spacing.md,
+    borderTopWidth: 1,
+    borderTopColor: colors.border + '40',
+  },
+  mobileInfoRow: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    paddingVertical: spacing.xs,
+  },
+  mobileLabel: {
+    fontSize: getResponsiveFontSize(typography.bodySm, true),
+    color: colors.textSecondary,
+    fontWeight: typography.fontWeights.medium,
+  },
+  mobileValue: {
+    fontSize: getResponsiveFontSize(typography.bodySm, true),
+    color: colors.textPrimary,
+  },
+  
+  // Estilos para desktop
+  desktopPersonalCard: {
+    width: '100%',
+    marginBottom: spacing.lg,
+  },
+  desktopCardRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    minHeight: 60,
   },
 });
 

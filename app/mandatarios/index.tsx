@@ -209,9 +209,11 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     flexWrap: 'wrap',
     gap: spacing.lg,
+    marginBottom: spacing.xxxl,
   },
   mandatarioCard: {
     width: '48%',
+    marginBottom: spacing.lg,
     padding: spacing.lg,
   },
   mandatarioHeader: {
@@ -296,6 +298,15 @@ const styles = StyleSheet.create({
     color: colors.error,
     fontSize: typography.bodySm,
     fontWeight: typography.fontWeights.medium,
+  },
+  '@media (max-width: 700px)': {
+    mandatariosGrid: {
+      flexDirection: 'column',
+      gap: spacing.lg,
+    },
+    mandatarioCard: {
+      width: '100%',
+    },
   },
 });
 

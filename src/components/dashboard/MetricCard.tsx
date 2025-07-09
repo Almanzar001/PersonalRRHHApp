@@ -1,18 +1,22 @@
 import React from "react";
-import { View, Text, TouchableOpacity, StyleSheet, Alert } from "react-native";
+import { View, Text, TouchableOpacity, StyleSheet, Alert, ViewStyle } from "react-native";
 import { Ionicons } from '@expo/vector-icons';
 import { useRouter } from 'expo-router';
-import { baseStyles, colors, spacing, typography, shadows } from "../../styles/theme";
+import { baseStyles, colors, spacing, typography, shadows, getResponsiveFontSize } from "../../styles/theme";
 import { LinearGradient } from 'expo-linear-gradient';
+import { useResponsive } from "../../hooks/useResponsive";
 
 interface MetricCardProps {
   title: string;
   value: string | number;
   onPress?: () => void;
+  style?: ViewStyle;
+  icon?: string;
 }
 
-const MetricCard: React.FC<MetricCardProps> = ({ title, value, onPress }) => {
+const MetricCard: React.FC<MetricCardProps> = ({ title, value, onPress, style, icon }) => {
   const CardComponent = onPress ? TouchableOpacity : View;
+  const { isMobile, isTablet } = useResponsive();
 
   const getGradientColors = (cardTitle: string) => {
     switch (cardTitle) {
@@ -29,9 +33,65 @@ const MetricCard: React.FC<MetricCardProps> = ({ title, value, onPress }) => {
     }
   };
 
+  const getIconColor = (cardTitle: string) => {
+    switch (cardTitle) {
+      case 'Miembros ERD':
+        return '#22c55e';
+      case 'Miembros ARD':
+        return '#fbbf24';
+      case 'Miembros FARD':
+        return '#3b82f6';
+      case 'Miembros PN':
+        return '#6b7280';
+      case 'Miembros MIDE':
+        return '#8b5cf6';
+      default:
+        return colors.primary;
+    }
+  };
+
+  const getDefaultIcon = (cardTitle: string) => {
+    switch (cardTitle) {
+      case 'Total Personal':
+        return 'people';
+      case 'Miembros ERD':
+        return 'shield';
+      case 'Miembros ARD':
+        return 'boat';
+      case 'Miembros FARD':
+        return 'airplane';
+      case 'Miembros PN':
+        return 'car';
+      case 'Miembros MIDE':
+        return 'business';
+      default:
+        return 'person';
+    }
+  };
+
+  const getResponsiveTextStyles = () => {
+    return {
+      value: {
+        fontSize: getResponsiveFontSize(typography.h3, isMobile, isTablet),
+        color: colors.primary,
+        fontWeight: typography.fontWeights.bold,
+        marginBottom: spacing.sm,
+        textAlign: 'center' as const,
+      },
+      title: {
+        fontSize: getResponsiveFontSize(typography.bodySm, isMobile, isTablet),
+        color: colors.textSecondary,
+        fontWeight: typography.fontWeights.medium,
+        textAlign: 'center' as const,
+      },
+    };
+  };
+
+  const responsiveTextStyles = getResponsiveTextStyles();
+
   return (
     <CardComponent
-      style={[baseStyles.card, styles.container]}
+      style={[baseStyles.card, styles.container, style]}
       onPress={onPress}
       activeOpacity={onPress ? 0.95 : 1}
     >
@@ -41,12 +101,21 @@ const MetricCard: React.FC<MetricCardProps> = ({ title, value, onPress }) => {
         style={styles.gradientHeader}
       />
       <View style={styles.content}>
-        <Text style={styles.value}>
-          {value}
-        </Text>
-        <Text style={styles.title}>
-          {title}
-        </Text>
+        <View style={styles.iconContainer}>
+          <Ionicons 
+            name={icon || getDefaultIcon(title)} 
+            size={isMobile ? 20 : 24} 
+            color={getIconColor(title)} 
+          />
+        </View>
+        <View style={styles.textContainer}>
+          <Text style={responsiveTextStyles.value}>
+            {value}
+          </Text>
+          <Text style={responsiveTextStyles.title}>
+            {title}
+          </Text>
+        </View>
       </View>
     </CardComponent>
   );
@@ -54,7 +123,6 @@ const MetricCard: React.FC<MetricCardProps> = ({ title, value, onPress }) => {
 
 const styles = StyleSheet.create({
   container: {
-    flex: 1,
     position: 'relative',
     overflow: 'hidden',
   },
@@ -68,23 +136,20 @@ const styles = StyleSheet.create({
   },
   content: {
     flex: 1,
-    justifyContent: 'center',
+    flexDirection: 'row',
     alignItems: 'center',
     paddingTop: spacing.md,
     paddingHorizontal: spacing.md,
+    gap: spacing.md,
   },
-  value: {
-    fontSize: typography.h3,
-    color: colors.primary,
-    fontWeight: typography.fontWeights.bold,
-    marginBottom: spacing.sm,
-    textAlign: 'center',
+  iconContainer: {
+    alignItems: 'center',
+    justifyContent: 'center',
   },
-  title: {
-    fontSize: typography.bodySm,
-    color: colors.textSecondary,
-    fontWeight: typography.fontWeights.medium,
-    textAlign: 'center',
+  textContainer: {
+    flex: 1,
+    alignItems: 'center',
+    justifyContent: 'center',
   },
 });
 
