@@ -1,11 +1,11 @@
 {
   "expo": {
-    "name": "client",
-    "slug": "client",
+    "name": "PersonalRRHHApp",
+    "slug": "personal-rrhh-app",
     "version": "1.0.0",
     "orientation": "portrait",
     "icon": "./assets/images/icon.png",
-    "scheme": "client",
+    "scheme": "personalrrhh",
     "userInterfaceStyle": "automatic",
     "newArchEnabled": true,
     "splash": {
